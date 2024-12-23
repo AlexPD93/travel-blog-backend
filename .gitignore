@@ -1,0 +1,22 @@
+# Ignore Visual Studio temporary files, build results, and
+# user-specific files.
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+
+# Exclude files created by NuGet
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Exclude secrets and environment variables
+appsettings.json
+appsettings.*.json
+.env
+launchSettings.json
