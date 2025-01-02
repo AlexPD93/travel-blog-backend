@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using travel_blog_backend.Models;
 using travel_blog_backend.Services;
 using travel_blog_backend.DTOs;
+using System.Text.Json;
 
 namespace travel_blog_backend.Controllers;
 
@@ -20,13 +21,15 @@ public class PostsController : ControllerBase
     public async Task<IActionResult> GetPosts()
     {
         var posts = await _postService.GetPosts();
-        var postDtos = posts.Select(p => new PostDto
+        var postDtos = posts.Select(post => new PostDto
         {
-            Id = p.Id,
-            Title = p.Title,
-            Content = p.Content,
-            CreatedAt = p.CreatedAt,
-            UpdatedAt = p.UpdatedAt
+            Id = post.Id,
+            Title = post.Title,
+            Content = post.Content,
+            ImageUrl = post.ImageUrl,
+            Category = post.Category,
+            CreatedAt = post.CreatedAt,
+            UpdatedAt = post.UpdatedAt
         }).ToList();
 
         return Ok(postDtos);
@@ -45,6 +48,8 @@ public class PostsController : ControllerBase
             Id = post.Id,
             Title = post.Title,
             Content = post.Content,
+            ImageUrl = post.ImageUrl,
+            Category = post.Category,
             CreatedAt = post.CreatedAt,
             UpdatedAt = post.UpdatedAt
         };
@@ -53,9 +58,36 @@ public class PostsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreatePost([FromBody] Post post)
+    public async Task<IActionResult> CreatePost([FromBody] CreatePostDto createPostDto)
     {
+        if (createPostDto == null)
+        {
+            return BadRequest(new { Message = "Post data is required" });
+        }
+
+        var post = new Post
+        {
+            Title = createPostDto.Title,
+            Content = createPostDto.Content,
+            ImageUrl = createPostDto.ImageUrl,
+            Category = createPostDto.Category,
+            CreatedAt = DateTimeOffset.UtcNow,
+        };
+
         var createdPost = await _postService.CreatePost(post);
-        return CreatedAtAction(nameof(GetPosts), new { id = createdPost.Id }, createdPost);
+
+        if (createdPost == null)
+        {
+            return StatusCode(500, new { Message = "There was an error creating the post" });
+        }
+        var postDto = new CreatePostDto
+        {
+            Title = createdPost.Title,
+            Content = createdPost.Content,
+            ImageUrl = createPostDto.ImageUrl,
+            Category = createPostDto.Category,
+            CreatedAt = DateTimeOffset.UtcNow,
+        };
+        return CreatedAtAction(nameof(GetPostById), new { id = createdPost.Id }, postDto);
     }
 }

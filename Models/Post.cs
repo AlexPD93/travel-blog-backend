@@ -16,7 +16,11 @@ public class Post : BaseModel
     [Column("content")]
     public string Content { get; set; } = string.Empty;
     [Column("created_at")]
-    public DateTime CreatedAt { get; set; }
+    public DateTimeOffset? CreatedAt { get; set; }
     [Column("updated_at")]
-    public DateTime UpdatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
+    [Column("category")]
+    public string Category { get; set; } = string.Empty;
+    [Column("image_url")]
+    public string ImageUrl { get; set; } = string.Empty;
 }
